@@ -31,13 +31,13 @@ public class FarmGrid implements Grid{
 
         this.farmType = farmType;
 
-        this.rows = columns;
-        this.columns = rows;
+        this.rows = rows;
+        this.columns = columns;
 
 
         farmState = new ArrayList<List<String>>();
 
-        randomQuality = null;
+        randomQuality = new RandomQuality();
 
         // populate the initial farm with empty ground
         int i = 0;
@@ -77,7 +77,7 @@ public class FarmGrid implements Grid{
 
         int positionIndex = (row * this.columns) + (column);
 
-        if (row <= 0 || column <= 0) {
+        if (row < 0 || column < 0) {
             return false;
         }
 
@@ -103,7 +103,7 @@ public class FarmGrid implements Grid{
 
 
 
-        String symbolString = Integer.toString(symbol);
+        String symbolString = Character.toString(symbol);
 
         try {
 
@@ -145,7 +145,7 @@ public class FarmGrid implements Grid{
 
     @Override
     public int getColumns() {
-        return this.columns - 1;
+        return this.columns;
     }
 
     public void remove(int row, int column) {
@@ -240,7 +240,7 @@ public class FarmGrid implements Grid{
                 if (positionInfo.get(0).equals("cow")) {
                     positionInfo = List.of(positionInfo.get(0), positionInfo.get(1), positionInfo.get(2), "Collected: true");
                     farmState.set(positionIndex, positionInfo);
-                    return new Egg(quality);
+                    return new Milk(quality);
 
                 } else if (positionInfo.get(0).equals("chicken")) {
                     positionInfo = List.of(positionInfo.get(0), positionInfo.get(1), positionInfo.get(2), "Collected: true");
@@ -398,7 +398,7 @@ public class FarmGrid implements Grid{
                 }
             } else if (this.farmType.equals("animal")) {
                 // if animal, reset fed and collected to false
-                if (!animalSymbols.contains(itemInfo.get(1))) {
+                if (animalSymbols.contains(itemInfo.get(1))) {
                     String symbol = itemInfo.get(1);
                     String name = itemInfo.get(0);
                     farmState.set(i, List.of(name, symbol, "Fed: false", "Collected: false"));
