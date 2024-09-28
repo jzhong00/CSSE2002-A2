@@ -11,9 +11,7 @@ import java.util.List;
 
 public class FarmGrid implements Grid {
 
-    protected Cell[][] farmState;
-    protected int rows;
-    protected int columns;
+    private GridManager gridManager;
     protected String farmType;
     protected RandomQuality randomQuality;
 
@@ -34,18 +32,11 @@ public class FarmGrid implements Grid {
             throw new IllegalArgumentException("FarmType must be either plant or animal");
         }
 
+        this.gridManager = new GridManager(rows, columns);
         this.farmType = farmType;
-        this.rows = rows;
-        this.columns = columns;
         this.randomQuality = new RandomQuality();
-        this.farmState = new Cell[rows][columns];
 
-        // populate the initial farm with empty ground
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                farmState[i][j] = new Cell();
-            }
-        }
+
     }
 
 
@@ -70,7 +61,7 @@ public class FarmGrid implements Grid {
     @Override
     public boolean place(int row, int column, char symbol) {
 
-        if (!isValidCell(row, column)) {
+        if (!gridManager.isValidCell(row, column)) {
             return false;
         }
 
@@ -81,7 +72,7 @@ public class FarmGrid implements Grid {
             return false;
         }
 
-        Cell cell = farmState[row][column];
+        Cell cell = gridManager.getCell(row, column);
         if (!cell.isEmpty()) {
             throw new IllegalStateException("Something is already there!");
         }
@@ -122,14 +113,9 @@ public class FarmGrid implements Grid {
         return this.columns;
     }
 
-    protected Boolean isValidCell(int row, int column) {
-        return (row >= 0 && row < rows && column >= 0 && column < columns);
-    }
 
     public void remove(int row, int column) {
-        if (isValidCell(row, column)) {
-            farmState[row][column].removeEntity();
-        }
+        gridManager.removeEntity(row, column);
     }
 
     @Override
