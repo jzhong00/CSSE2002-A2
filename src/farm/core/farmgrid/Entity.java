@@ -24,6 +24,7 @@ public enum Entity {
         this.type = type;
     }
 
+
     public char getSymbol() {
         return this.symbol;
     }
@@ -53,6 +54,10 @@ public enum Entity {
         return this.type;
     }
 
+    public int getStage() {
+        return this.stage;
+    }
+
     public static Entity getBySymbol(char symbol) {
         for (Entity entity : values()) {
             if (entity.getSymbol() == symbol) {
@@ -61,13 +66,4 @@ public enum Entity {
         }
         return null;
     }
-
-    public static String[] getEntityInfo(char symbol) {
-        Entity entity = getBySymbol(symbol);
-        if (entity != null) {
-            return new String[]{entity.getName(), String.valueOf(entity.getSymbol()), entity.getType()};
-        }
-        return null; // Return null if the symbol doesn't match any entity
-    }
-
 }
