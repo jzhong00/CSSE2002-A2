@@ -54,10 +54,6 @@ public enum Entity {
         return this.type;
     }
 
-    public int getStage() {
-        return this.stage;
-    }
-
     public static Entity getBySymbol(char symbol) {
         for (Entity entity : values()) {
             if (entity.getSymbol() == symbol) {

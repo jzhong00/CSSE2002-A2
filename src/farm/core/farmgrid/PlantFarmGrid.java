@@ -6,6 +6,7 @@ import farm.inventory.product.data.Quality;
 
 import java.util.List;
 
+
 public class PlantFarmGrid extends FarmGrid {
 
     public PlantFarmGrid(int rows, int columns) {
@@ -13,9 +14,15 @@ public class PlantFarmGrid extends FarmGrid {
     }
 
     @Override
-    public boolean placeEntity(int row, int column, Entity entity) {
+    public String getFarmType() {
+        return "plant";
+    }
+
+
+    @Override
+    public boolean placeEntity(int row, int column, FarmEntity entity) {
         if (!entity.getType().equals("plant")) {
-            throw new IllegalArgumentException("You cannot place an animal on a plant farm!")
+            throw new IllegalArgumentException("You cannot place an animal on a plant farm!");
         }
         List<String> positionInfo = List.of(
                 entity.getName(),
@@ -31,7 +38,7 @@ public class PlantFarmGrid extends FarmGrid {
 
         Cell cell = farmState[row][column];
 
-        Entity entity = validateEntityForHarvest(cell);
+        FarmEntity entity = validateEntityForHarvest(cell);
 
         Quality quality = randomQuality.getRandomQuality();
         resetPlantStage(row, column, entity);
@@ -45,58 +52,37 @@ public class PlantFarmGrid extends FarmGrid {
     }
 
     @Override
-    public void resetCell(int row, int column, Entity entity) {
-
-        int stageNum = entity.getStage();
-        String stage = "Stage: " + String.valueOf(stageNum);
-
+    public void resetCell(int row, int column, FarmEntity entity) throws UnableToInteractException {
         if (entity.getType().equals("plant")) {
-            String name = entity.getName();
-            String[] growthStages;
-            switch (entity) {
-                case BERRY:
-                    growthStages = new String[]{".", "o", "@"};
-                case WHEAT:
-                    growthStages = new String[]{".", "#"};
-                case COFFEE:
-                    growthStages = new String[]{".", "*"};
-                default:
-                    break;
-            }
+            List<String> cellInfo = entity.grow();
+            farmState[row][column].addEntity(entity, cellInfo);
         }
-
     }
 
 
-    private Entity validateEntityForHarvest(Cell cell) throws UnableToInteractException {
+    private FarmEntity validateEntityForHarvest(Cell cell) throws UnableToInteractException {
         if (cell.isEmpty()) {
             throw new UnableToInteractException("You can't harvest an empty spot!");
         }
 
-        Entity entity = cell.getEntity();
+        FarmEntity entity = cell.getEntity();
 
         if (!entity.getType().equals("plant")) {
             throw new UnableToInteractException("You have an animal on a plant farm!");
         }
 
-        if (!isPlantFullyGrown(entity)) {
-            throw new UnableToInteractException("The crop is not fully grown!");
-        }
+        entity.checkReadyForHarvest();
 
         return entity;
     }
 
-    private boolean isPlantFullyGrown(Entity plant) {
-        String symbol = String.valueOf(plant.getSymbol());
-        return symbol.equals("#") || symbol.equals("%") || symbol.equals("@");
 
-    }
 
-    private void resetPlantStage(int row, int column, Entity entity) {
-        String resetSymbol = switch (entity) {
-            case WHEAT -> "\u1F34";
-            case COFFEE -> ":";
-            case BERRY -> ".";
+    private void resetPlantStage(int row, int column, FarmEntity entity) {
+        String resetSymbol = switch (entity.getName()) {
+            case "wheat" -> "\u1F34";
+            case "coffee" -> ":";
+            case "berry" -> ".";
             default -> throw new IllegalStateException("Unexpected entity: " + entity);
         };
 

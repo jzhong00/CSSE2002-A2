@@ -67,9 +67,10 @@ public abstract class FarmGrid implements Grid {
             return false;
         }
 
-        Entity entity = Entity.getBySymbol(symbol);
-
-        if (entity == null) {
+        FarmEntity entity;
+        try {
+            entity = FarmEntity.createFarmEntity(symbol, this.getFarmType());
+        } catch (UnableToInteractException e) {
             return false;
         }
 
@@ -81,12 +82,11 @@ public abstract class FarmGrid implements Grid {
         return this.placeEntity(row, column, entity);
     }
 
-    protected abstract boolean placeEntity(int row, int column, Entity entity);
+    protected abstract boolean placeEntity(int row, int column, FarmEntity entity);
 
     @Override
     public int getRows() {
         return this.rows;
-
     }
 
     @Override
@@ -94,7 +94,7 @@ public abstract class FarmGrid implements Grid {
         return this.columns;
     }
 
-    // TODO: Refactor?
+    // TODO: Should be in GridManager
     protected Boolean isValidCell(int row, int column) {
         return (row >= 0 && row < rows && column >= 0 && column < columns);
     }
@@ -129,7 +129,7 @@ public abstract class FarmGrid implements Grid {
                 char symbol = ' ';
 
                 if (!cell.isEmpty()) {
-                    symbol = cell.getEntity().getSymbol();
+                    symbol = (char) cell.getEntity().getSymbol();
                 }
                 sb.append(symbol).append(" ");
             }
@@ -166,20 +166,20 @@ public abstract class FarmGrid implements Grid {
 
     public abstract boolean handleFeedCommand(int row, int column) throws UnableToInteractException;
 
-    public void endDay() {
+    public void endDay() throws UnableToInteractException {
         // Iterate through each cell in the farm grid
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < columns; col++) {
                 Cell cell = farmState[row][col];
                 if (!cell.isEmpty()) {
-                    Entity entity = cell.getEntity();
+                    FarmEntity entity = cell.getEntity();
                     resetCell(row, col, entity);
                 }
             }
         }
     }
 
-    public abstract void resetCell(int row, int column, Entity entity);
+    public abstract void resetCell(int row, int column, FarmEntity entity) throws UnableToInteractException;
 
 
 

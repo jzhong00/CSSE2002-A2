@@ -3,15 +3,15 @@ package farm.core.farmgrid;
 import java.util.List;
 
 public class Cell {
-    private Entity entity;
+    private FarmEntity entity;
     private List<String> positionInfo;
 
-    public void addEntity(Entity entity, List<String> positionInfo) {
+    public void addEntity(FarmEntity entity, List<String> positionInfo) {
         this.entity = entity;
         this.positionInfo = positionInfo;
     }
 
-    public Entity getEntity() {
+    public FarmEntity getEntity() {
         return entity;
     }
 
