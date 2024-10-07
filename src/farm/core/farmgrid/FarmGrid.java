@@ -6,15 +6,17 @@ import farm.inventory.product.data.Quality;
 import farm.inventory.product.data.RandomQuality;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
-public abstract class FarmGrid implements Grid {
+public class FarmGrid implements Grid {
 
-    protected Cell[][] farmState;
-    protected int rows;
-    protected int columns;
-    protected RandomQuality randomQuality;
+    private Cell[][] farmState;
+    private final int rows;
+    private final int columns;
+    private final RandomQuality randomQuality;
+    private final String farmType;
 
 
     /**
@@ -34,6 +36,7 @@ public abstract class FarmGrid implements Grid {
         this.columns = columns;
         this.randomQuality = new RandomQuality();
         this.farmState = new Cell[rows][columns];
+        this.farmType = farmType;
 
         // Populate the initial farm with empty ground
         for (int i = 0; i < rows; i++) {
@@ -58,7 +61,9 @@ public abstract class FarmGrid implements Grid {
         this(rows, columns, "plant");
     }
 
-    public abstract String getFarmType();
+    public String getFarmType() {
+        return farmType;
+    }
 
     @Override
     public boolean place(int row, int column, char symbol) {
@@ -70,8 +75,13 @@ public abstract class FarmGrid implements Grid {
         FarmEntity entity;
         try {
             entity = FarmEntity.createFarmEntity(symbol, this.getFarmType());
-        } catch (UnableToInteractException e) {
+        } catch (IllegalArgumentException | UnableToInteractException e) {
             return false;
+        }
+        if (!this.getFarmType().equals(entity.getType())) {
+            throw new IllegalArgumentException(
+                    "You cannot place a " + entity.getType() + " on a " + this.getFarmType()
+            );
         }
 
         Cell cell = farmState[row][column];
@@ -82,7 +92,21 @@ public abstract class FarmGrid implements Grid {
         return this.placeEntity(row, column, entity);
     }
 
-    protected abstract boolean placeEntity(int row, int column, FarmEntity entity);
+    protected boolean placeEntity(int row, int column, FarmEntity entity) {
+        String[] additionalInfo;
+        if (entity.getType().equals("plant")) {
+            additionalInfo = new String[]{"Stage: 1"};
+        } else {
+            additionalInfo = new String[]{"Fed: false", "Collected: false"};
+        }
+        List<String> positionInfo = new ArrayList<>(List.of(
+                entity.getName(),
+                String.valueOf(entity.getSymbol())
+        ));
+        positionInfo.addAll(Arrays.asList(additionalInfo));
+        farmState[row][column].addEntity(entity, positionInfo);
+        return true;
+    }
 
     @Override
     public int getRows() {
@@ -144,15 +168,50 @@ public abstract class FarmGrid implements Grid {
         return getTheFarmStatsList();
     }
 
-    @Override
-    public abstract Product harvest(int row, int column) throws UnableToInteractException;
+    public Product harvest(int row, int column) throws UnableToInteractException {
+        if (!isValidCell(row, column)) {
+            throw new UnableToInteractException("You can't harvest this location");
+        }
+
+        Cell cell = farmState[row][column];
+        FarmEntity entity = validateEntityForHarvest(cell);
+        Quality quality = randomQuality.getRandomQuality();
+
+        List<String> positionInfo = entity.harvestEntity();
+        farmState[row][column].addEntity(entity, positionInfo);
+
+        return entity.getProduct(quality);
+    }
+
+    private FarmEntity validateEntityForHarvest(Cell cell) throws UnableToInteractException {
+        if (cell.isEmpty()) {
+            throw new UnableToInteractException("You can't harvest an empty spot!");
+        }
+
+        FarmEntity entity = cell.getEntity();
+
+        if (!this.getFarmType().equals(entity.getType())) {
+            throw new IllegalArgumentException(
+                    "You cannot place a " + entity.getType() + " on a " + this.getFarmType()
+            );
+        }
+        entity.checkReadyForHarvest();
+
+        return entity;
+    }
+
 
     @Override
     public boolean interact(String command, int row, int column) throws UnableToInteractException {
+        if (!isValidCell(row, column)) {
+            return false;
+        }
         switch (command) {
             case "feed":
-                // TODO: implement in animal farm
-                return handleFeedCommand(row, column);
+                FarmEntity entity = farmState[row][column].getEntity();
+                List<String> positionInfo = entity.feed();
+                farmState[row][column].addEntity(entity, positionInfo);
+                return true;
             case "end-day":
                 this.endDay();
                 return true;
@@ -164,24 +223,21 @@ public abstract class FarmGrid implements Grid {
         }
     }
 
-    public abstract boolean handleFeedCommand(int row, int column) throws UnableToInteractException;
 
-    public void endDay() throws UnableToInteractException {
+
+    public void endDay() {
         // Iterate through each cell in the farm grid
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < columns; col++) {
                 Cell cell = farmState[row][col];
                 if (!cell.isEmpty()) {
                     FarmEntity entity = cell.getEntity();
-                    resetCell(row, col, entity);
+                    List<String> positionInfo = entity.reset();
+                    farmState[row][col].addEntity(entity, positionInfo);
                 }
             }
         }
     }
-
-    public abstract void resetCell(int row, int column, FarmEntity entity) throws UnableToInteractException;
-
-
 
     /**
      * Method for retrieving the stats for the current farm.
@@ -208,4 +264,28 @@ public abstract class FarmGrid implements Grid {
         }
         return farmStats;
     }
+
+    public void addToCell(int row, int col, char entitySymbol, List<String> positionInfo) throws UnableToInteractException {
+        Cell cell = farmState[row][col];
+        FarmEntity entity = FarmEntity.createFarmEntity(entitySymbol, this.getFarmType());
+        if (this.getFarmType().equals("plant")) {
+            int stage = positionInfo.get(2).charAt(positionInfo.get(2).length() - 1);
+            ((Plant) entity).setGrowthStage(stage);
+        } else {
+            boolean fed = false;
+            boolean collected = false;
+
+            if (positionInfo.get(2).contains("true")) {
+                fed = true;
+            }
+            if (positionInfo.get(3).contains("true")) {
+                collected = true;
+            }
+            ((Animal) entity).setFed(fed);
+            ((Animal) entity).setCollected(collected);
+        }
+
+        cell.addEntity(entity, positionInfo);
+    }
+
 }

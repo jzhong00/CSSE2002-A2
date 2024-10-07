@@ -1,0 +1,4 @@
+animal,3,3
+ground, |ground, |ground, 
+ground, |cow,४,Fed: false,Collected: false|ground, 
+ground, |ground, |ground, 

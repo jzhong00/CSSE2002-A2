@@ -26,7 +26,7 @@ public abstract class FarmEntity {
         return this;
     }
 
-    public int getSymbol() {
+    public char getSymbol() {
         return entity.getSymbol();
     }
 
@@ -46,9 +46,11 @@ public abstract class FarmEntity {
         return entity.getProduct(quality);
     }
 
-    public abstract List<String> grow() throws UnableToInteractException;
-
     public abstract void checkReadyForHarvest() throws UnableToInteractException;
 
-    public abstract void harvestEntity() throws UnableToInteractException;
+    public abstract List<String> harvestEntity();
+
+    public abstract List<String> feed() throws UnableToInteractException;
+
+    public abstract List<String> reset();
 }

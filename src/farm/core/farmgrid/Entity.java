@@ -60,6 +60,6 @@ public enum Entity {
                 return entity;
             }
         }
-        return null;
+        throw new IllegalArgumentException("Invalid Symbol");
     }
 }

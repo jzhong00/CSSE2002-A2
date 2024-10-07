@@ -27,5 +27,4 @@ public class Cell {
         this.entity = null;
         this.positionInfo = null;
     }
-
 }

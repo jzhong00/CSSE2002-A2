@@ -27,23 +27,47 @@ public class Animal extends FarmEntity {
     }
 
     @Override
-    public List<String> grow() throws UnableToInteractException{
-        throw new UnableToInteractException();
+    public List<String> harvestEntity() {
+        this.setCollected(true);
+
+        return getPositionInfo();
     }
 
-    private boolean getFed() {
+    public List<String> getPositionInfo() {
+        return List.of(
+              getName(),
+              String.valueOf(getSymbol()),
+              "Fed: " + getFed(),
+              "Collected: " + getCollected()
+        );
+    }
+
+    @Override
+    public List<String> feed() {
+        setFed(true);
+        return getPositionInfo();
+    }
+
+    @Override
+    public List<String> reset() {
+        setFed(false);
+        setCollected(false);
+        return getPositionInfo();
+    }
+
+    public boolean getFed() {
         return fed;
     }
 
-    private void setFed(boolean fed) {
+    public void setFed(boolean fed) {
         this.fed = fed;
     }
 
-    private boolean getCollected() {
+    public boolean getCollected() {
         return collected;
     }
 
-    private void setCollected(boolean collected) {
+    public void setCollected(boolean collected) {
         this.collected = collected;
     }
 }
