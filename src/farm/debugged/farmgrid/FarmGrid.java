@@ -174,7 +174,6 @@ public class FarmGrid implements Grid {
         String horizontalFence = "-".repeat((this.columns * 2) + 3);
 
         String farmDisplay = horizontalFence + System.lineSeparator();
-        int count = 0;
 
         // start each line with a "|" fence character
         // then display symbols with a space either side
@@ -182,14 +181,13 @@ public class FarmGrid implements Grid {
         // note System.lineSeparator() is just \n but ensures it works
         // on all operating systems.
 
-        for (int i=0; i < this.rows;) {
+        for (int i=0; i < this.rows; i++) {
             farmDisplay += "| ";
             for (int j=0; j < this.columns; j++) {
                 int positionIndex = (i * this.columns) + j;
                 farmDisplay += farmState.get(positionIndex).get(1) + " ";
             }
             farmDisplay += "|" + System.lineSeparator();
-            count++;
         }
         farmDisplay += horizontalFence + System.lineSeparator();
         return farmDisplay;

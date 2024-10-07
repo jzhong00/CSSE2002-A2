@@ -69,11 +69,8 @@ public class FileLoader {
                 List<String> entityParts = List.of(cellInfo.split(","));
                 if (entityParts.size() > 2) {
                     char entitySymbol = entityParts.get(1).charAt(0);
-                    try {
-                        farmGrid.addToCell(row, col, entitySymbol, entityParts);
-                    } catch (UnableToInteractException e) {
-                        System.out.println("Unable to add entity to grid");
-                    }
+                    //                        farmGrid.addToCell(row, col, entitySymbol, entityParts);
+                    System.out.println(12);
                 }
             }
         }
