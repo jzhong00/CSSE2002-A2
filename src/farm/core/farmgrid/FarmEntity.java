@@ -38,10 +38,6 @@ public abstract class FarmEntity {
         return entity.getBarcode();
     }
 
-    public String getType() {
-        return entity.getType();
-    }
-
     public Product getProduct(Quality quality) {
         return entity.getProduct(quality);
     }
@@ -50,7 +46,12 @@ public abstract class FarmEntity {
 
     public abstract List<String> harvestEntity();
 
+    public abstract String getType();
+
     public abstract List<String> feed() throws UnableToInteractException;
 
     public abstract List<String> reset();
+
+    public abstract List<String> getPositionInfo();
+
 }

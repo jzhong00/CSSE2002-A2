@@ -113,4 +113,14 @@ public class BasicInventoryTest {
 
         assertFalse("Incorrectly returned if product was in inventory", inventory.existsProduct(wool));
     }
+
+    @Test
+    public void testExistProductInMultipleItems() {
+        inventory.addProduct(egg, silver);
+        inventory.addProduct(wool, regular);
+        inventory.addProduct(milk, gold);
+
+        assertTrue("Unable to find product in inventory", inventory.existsProduct(wool));
+    }
+
 }

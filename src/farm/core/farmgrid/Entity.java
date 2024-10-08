@@ -5,23 +5,21 @@ import farm.inventory.product.data.Barcode;
 import farm.inventory.product.data.Quality;
 
 public enum Entity {
-    BERRY('.', "berry", Barcode.JAM, "plant"),
-    COFFEE(':', "coffee", Barcode.COFFEE, "plant"),
-    WHEAT('\u1F34', "wheat", Barcode.BREAD, "plant"),
-    CHICKEN('\u09EC', "chicken", Barcode.EGG, "animal"),
-    COW('\u096A', "cow", Barcode.MILK, "animal"),
-    SHEEP('\u0D94', "sheep", Barcode.WOOL, "animal");
+    BERRY('.', "berry", Barcode.JAM),
+    COFFEE(':', "coffee", Barcode.COFFEE),
+    WHEAT('\u1F34', "wheat", Barcode.BREAD),
+    CHICKEN('\u09EC', "chicken", Barcode.EGG),
+    COW('\u096A', "cow", Barcode.MILK),
+    SHEEP('\u0D94', "sheep", Barcode.WOOL);
 
     private final char symbol;
     private final String name;
     private final Barcode barcode;
-    private final String type;
 
-    Entity(char symbol, String name, Barcode barcode, String type) {
+    Entity(char symbol, String name, Barcode barcode) {
         this.symbol = symbol;
         this.name = name;
         this.barcode = barcode;
-        this.type = type;
     }
 
 
@@ -48,10 +46,6 @@ public enum Entity {
             default ->
                     throw new IllegalStateException("Unexpected product barcode: " + this.barcode);
         };
-    }
-
-    public String getType() {
-        return this.type;
     }
 
     public static Entity getBySymbol(char symbol) {

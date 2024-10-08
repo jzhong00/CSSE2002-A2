@@ -29,10 +29,10 @@ public class Animal extends FarmEntity {
     @Override
     public List<String> harvestEntity() {
         this.setCollected(true);
-
         return getPositionInfo();
     }
 
+    @Override
     public List<String> getPositionInfo() {
         return List.of(
               getName(),
@@ -53,6 +53,11 @@ public class Animal extends FarmEntity {
         setFed(false);
         setCollected(false);
         return getPositionInfo();
+    }
+
+    @Override
+    public String getType() {
+        return "animal";
     }
 
     public boolean getFed() {

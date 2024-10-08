@@ -6,6 +6,10 @@ import java.util.List;
 
 public class Plant extends FarmEntity {
 
+    private static final char[] BERRY_GROWTH_STAGES = {'.', 'o', '@'};
+    private static final char[] WHEAT_GROWTH_STAGES = {'\u1F34', '#'};
+    private static final char[] COFFEE_GROWTH_STAGES = {':', ';', '*', '%'};
+
     private int growthStage;
     private char[] growthStageSymbols;
 
@@ -49,12 +53,18 @@ public class Plant extends FarmEntity {
         return getPositionInfo();
     }
 
+    @Override
     public List<String> getPositionInfo() {
            return List.of(
               getName(),
               String.valueOf(getSymbol()),
               "Stage: " + getGrowthStage()
         );
+    }
+
+    @Override
+    public String getType() {
+        return "plant";
     }
 
     public int getGrowthStage() {
@@ -66,24 +76,23 @@ public class Plant extends FarmEntity {
     }
 
     private void setGrowthStageSymbols() {
-        switch (super.getName()) {
+        switch (getName()) {
             case "berry":
-                this.growthStageSymbols = new char[]{'.', 'o', '@'};
+                this.growthStageSymbols = BERRY_GROWTH_STAGES;
                 break;
             case "wheat":
-                this.growthStageSymbols = new char[]{'\u1F34', '#'};
+                this.growthStageSymbols = WHEAT_GROWTH_STAGES;
                 break;
             case "coffee":
-                this.growthStageSymbols = new char[]{':', ';', '*', '%'};
+                this.growthStageSymbols = COFFEE_GROWTH_STAGES;
                 break;
             default:
-                throw new IllegalArgumentException("Unknown plant type: " + super.getName());
+                throw new IllegalArgumentException("Unknown plant type: " + getName());
         }
     }
 
 
     private boolean isPlantFullyGrown() {
-        String symbol = String.valueOf(super.getFarmEntity().getSymbol());
-        return !symbol.equals("#") && !symbol.equals("%") && !symbol.equals("@");
+        return growthStage >= growthStageSymbols.length;
     }
 }
