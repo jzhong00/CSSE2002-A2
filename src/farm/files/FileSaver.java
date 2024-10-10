@@ -44,13 +44,21 @@ public class FileSaver {
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < columns; col++) {
-                List<String> cellStats = farmStats.get(row * rows + col);
+                List<String> cellStats = farmStats.get(getPositionIndex(row, col, columns));
                 writer.write(String.join(",", cellStats));
-                if (col < columns - 1) {
+                if (!isFinalColumn(col, columns)) {
                     writer.write("|");
                 }
             }
             writer.write("\n");
         }
+    }
+
+    private int getPositionIndex(int row, int col, int totalColumns) {
+        return row * totalColumns + col;
+    }
+
+    private boolean isFinalColumn(int col, int columns) {
+        return col < columns - 1;
     }
 }

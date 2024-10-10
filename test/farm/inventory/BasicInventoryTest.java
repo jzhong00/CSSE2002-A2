@@ -1,5 +1,6 @@
 package farm.inventory;
 
+import farm.core.FailedTransactionException;
 import farm.core.InvalidStockRequestException;
 import farm.inventory.product.Egg;
 import farm.inventory.product.Jam;
@@ -100,6 +101,16 @@ public class BasicInventoryTest {
     }
 
     @Test
+    public void testAddNullProduct() {
+        try {
+            inventory.addProduct(null, gold);
+            fail("Should have thrown a NullPointerException");
+        } catch (NullPointerException e) {
+            // Expected
+        }
+    }
+
+    @Test
     public void testExistsValidProduct() {
         inventory.addProduct(wool, silver);
 
@@ -157,6 +168,133 @@ public class BasicInventoryTest {
         assertTrue("Product that should not have been removed does not exist", inventory.existsProduct(egg));
         assertTrue("Product that should not have been removed does not exist", inventory.existsProduct(coffee));
 
+    }
+
+    @Test
+    public void testRemovingMultipleOfSameProduct() {
+        populateInventory(inventory);
+        inventory.addProduct(bread, regular);
+
+        try {
+            inventory.removeProduct(bread);
+            inventory.removeProduct(bread);
+        } catch (Exception e) {
+            fail(shouldNotThrow);
+        }
+
+        assertFalse("Not all products removed", inventory.existsProduct(bread));
+        assertTrue("Incorrect product removed", inventory.existsProduct(egg));
+        assertTrue("Incorrect product removed", inventory.existsProduct(coffee));
+    }
+
+    @Test
+    public void testRemoveProductFromEmptyInventory() {
+        List<Product> removedProduct = inventory.removeProduct(bread);
+
+        assertTrue("Should not have removed any products", removedProduct.isEmpty());
+        assertTrue("Inventory should still be empty", inventory.getAllProducts().isEmpty());
+    }
+
+    @Test
+    public void testRemoveProductWithInvalidQuantity() {
+        FailedTransactionException exception = assertThrows(
+                FailedTransactionException.class,
+                () -> inventory.removeProduct(bread, 5)
+        );
+
+        assertEquals(
+                "Current inventory is not fancy enough. Please purchase products one at a time.",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    public void testRemoveLastProductInInventory() {
+        inventory.addProduct(egg, regular);
+
+        inventory.removeProduct(egg);
+
+        assertTrue("Inventory should be empty after removing the last product", inventory.getAllProducts().isEmpty());
+    }
+
+    @Test
+    public void testRemoveMultipleDifferentProducts() {
+        inventory.addProduct(egg, regular);
+        inventory.addProduct(wool, silver);
+        inventory.addProduct(bread, gold);
+
+        inventory.removeProduct(egg);
+        inventory.removeProduct(bread);
+
+        assertFalse("Egg should have been removed", inventory.existsProduct(egg));
+        assertFalse("Bread should have been removed", inventory.existsProduct(bread));
+        assertTrue("Wool should still exist in the inventory", inventory.existsProduct(wool));
+    }
+
+    @Test
+    public void testGetAllProductsWhenEmpty() {
+        List<Product> products = inventory.getAllProducts();
+        assertTrue("Product list should be empty", products.isEmpty());
+    }
+
+    @Test
+    public void testGetAllProductsWithOneProduct() {
+        inventory.addProduct(bread, gold);
+
+        List<Product> products = inventory.getAllProducts();
+
+        assertEquals("Product list should contain one product", 1, products.size());
+        assertEquals("First product should be of type bread", bread, products.get(0).getBarcode());
+        assertEquals("Product quality should be gold", gold, products.get(0).getQuality());
+    }
+
+    @Test
+    public void testGetAllProductsWhenValid() {
+        populateInventory(inventory);
+        List<Product> products = inventory.getAllProducts();
+        assertEquals("Incorrect number of products in inventory", 3, products.size());
+        assertTrue("Did not return product that is in inventory",
+                   products.stream().anyMatch(product -> product.getBarcode() == bread));
+        assertTrue("Did not return product that is in inventory",
+                   products.stream().anyMatch(product -> product.getBarcode() == egg));
+        assertTrue("Did not return product that is in inventory",
+                   products.stream().anyMatch(product -> product.getBarcode() == coffee));
+    }
+
+    @Test
+    public void testGetAllProductsWithDuplicateProducts() {
+        inventory.addProduct(bread, regular);
+        inventory.addProduct(bread, regular);
+
+        List<Product> products = inventory.getAllProducts();
+
+        assertEquals("Product list should contain two products", 2, products.size());
+        assertEquals("Both products should be bread", bread, products.get(0).getBarcode());
+        assertEquals("Both products should have regular quality", regular, products.get(0).getQuality());
+    }
+
+    @Test
+    public void testImmutableProductList() {
+        inventory.addProduct(milk, gold);
+
+        List<Product> products = inventory.getAllProducts();
+        products.clear();  // Attempt to modify the returned list
+
+        List<Product> productsAfterModification = inventory.getAllProducts();
+        assertEquals("Inventory should not be affected by external list modifications", 1, productsAfterModification.size());
+    }
+
+    @Test
+    public void testGetAllProductsAfterRemovingAllProducts() {
+        inventory.addProduct(egg, silver);
+        inventory.addProduct(milk, gold);
+
+        inventory.removeProduct(egg);
+        inventory.removeProduct(milk);
+
+        List<Product> products = inventory.getAllProducts();
+
+        assertTrue("Product list should be empty after removing all products", products.isEmpty());
     }
 
     private void populateInventory(BasicInventory inventory) {

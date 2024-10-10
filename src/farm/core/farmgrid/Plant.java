@@ -70,7 +70,7 @@ public class Plant extends FarmEntity {
 
     @Override
     public void initialiseFromPositionInfo(List<String> positionInfo) {
-        int stage = positionInfo.get(2).charAt(positionInfo.get(2).length() - 1);
+        int stage = Integer.parseInt(positionInfo.get(2).substring(positionInfo.get(2).length() - 1));
         this.setGrowthStage(stage);
     }
 

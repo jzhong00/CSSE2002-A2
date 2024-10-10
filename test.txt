@@ -1,5 +1,6 @@
-plant,5,5ground, |ground, |ground, |ground, |ground, 
-ground, |berry,.,Stage: 1|ground, |ground, |wheat,ἴ,Stage: 1
-ground, |ground, |ground, |ground, |ground, 
-ground, |ground, |ground, |ground, |ground, 
-ground, |ground, |ground, |ground, |ground, 
+plant,5,6
+ground, |ground, |ground, |ground, |ground, |ground, 
+ground, |ground, |ground, |ground, |ground, |wheat,#,Stage: 2
+wheat,#,Stage: 2|ground, |ground, |ground, |ground, |ground, 
+ground, |ground, |ground, |ground, |berry,@,Stage: 3|ground, 
+ground, |ground, |ground, |ground, |ground, |ground, 

@@ -52,7 +52,7 @@ public class FileLoader {
 
         GridManager farmGridManager = new FarmGridManager(rows, cols);
         InteractionManager entityInteractionManager = new EntityInteractionManager(farmGridManager);
-        return new FarmGrid(farmGridManager, entityInteractionManager, this.farmType);
+        return new FarmGrid(farmGridManager, entityInteractionManager, FarmType.fromString(farmType));
     }
 
     private List<List<String>> loadFarmGrid(BufferedReader reader) throws IOException {
@@ -73,8 +73,8 @@ public class FileLoader {
                 String cellInfo = rowInfo.get(col);
                 List<String> entityParts = List.of(cellInfo.split(","));
                 if (entityParts.size() > 2) {
-                    char entitySymbol = entityParts.get(1).charAt(0);
-                    farmGrid.addToCell(row, col, entitySymbol, entityParts);
+                    String name = entityParts.getFirst();
+                    farmGrid.addToCell(row, col, name, entityParts);
                 }
             }
         }

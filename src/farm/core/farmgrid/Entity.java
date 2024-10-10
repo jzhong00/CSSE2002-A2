@@ -78,6 +78,15 @@ public enum Entity {
         throw new IllegalArgumentException("Invalid Symbol");
     }
 
+    public static char getSymbolByName(String name) {
+        for (Entity entity : values()) {
+            if (entity.getName().equals(name)) {
+                return entity.getSymbol();
+            }
+        }
+        throw new IllegalArgumentException("Unable to find symbol for " + name);
+    }
+
     private final char symbol;
     private final String name;
     private final Barcode barcode;

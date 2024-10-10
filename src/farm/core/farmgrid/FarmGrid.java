@@ -40,9 +40,11 @@ public class FarmGrid implements Grid {
      * @requires rows > 0 && columns > 0
      */
     public FarmGrid(int rows, int columns) {
-        GridManager farmGridManager = new FarmGridManager(rows, columns);
-        InteractionManager entityInteractionManager = new EntityInteractionManager(farmGridManager);
-        this(farmGridManager, entityInteractionManager, FarmType.PLANT);
+        this(
+                new FarmGridManager(rows, columns),
+                new EntityInteractionManager(new FarmGridManager(rows, columns)),
+                FarmType.PLANT
+        );
     }
 
     public String getFarmType() {
@@ -109,8 +111,8 @@ public class FarmGrid implements Grid {
         }
     }
 
-    public void addToCell(int row, int column, char symbol, List<String> entityInfo) {
-        FarmEntity entity = FarmEntity.createFarmEntity(symbol, farmType);
+    public void addToCell(int row, int column, String name, List<String> entityInfo) {
+        FarmEntity entity = FarmEntity.createFarmEntity(Entity.getSymbolByName(name), farmType.getName());
         entity.initialiseFromPositionInfo(entityInfo);
         gridManager.addToCell(row, column, entity);
     }
