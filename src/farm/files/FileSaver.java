@@ -21,25 +21,36 @@ public class FileSaver {
      * @throws IOException
      */
     public void save(String filename, Grid grid) throws IOException {
-        List<List<String>> farmStats = grid.getStats();
-        int numRows = grid.getRows();
-        int numCols = grid.getColumns();
-        FarmGrid farmGrid = (FarmGrid) grid;
-        String farmType = farmGrid.getFarmType();
-
         try (FileWriter writer = new FileWriter(filename)) {
-            writer.write(farmType + "," + numRows + "," + numCols + "\n");
-            for (int i = 0; i < numRows; i++) {
-                // Create a row by extracting the stats for each cell in the current row
-                for (int j = 0; j < numCols; j++) {
-                    List<String> cellStats = farmStats.get(i * numCols + j);  // Access cell in row-major order
-                    writer.write(String.join(",", cellStats));  // Write cell contents
-                    if (j < numCols - 1) {
-                        writer.write("|");  // Add a comma between cells, except after the last one in the row
-                    }
+            writeFarmInfo(writer, grid);
+            writeFarmGrid(writer, grid);
+        }
+    }
+
+    private void writeFarmInfo(FileWriter writer, Grid grid) throws IOException {
+        FarmGrid farmGrid = (FarmGrid) grid;
+        writer.write(
+                farmGrid.getFarmType()
+                    + "," + farmGrid.getRows()
+                    + "," + farmGrid.getColumns()
+                    + "\n"
+        );
+    }
+
+    private void writeFarmGrid(FileWriter writer, Grid grid) throws IOException {
+        List<List<String>> farmStats = grid.getStats();
+        int rows = grid.getRows();
+        int columns = grid.getColumns();
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < columns; col++) {
+                List<String> cellStats = farmStats.get(row * rows + col);
+                writer.write(String.join(",", cellStats));
+                if (col < columns - 1) {
+                    writer.write("|");
                 }
-                writer.write("\n");  // Move to the next line after writing a full row
             }
+            writer.write("\n");
         }
     }
 }

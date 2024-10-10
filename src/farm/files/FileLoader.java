@@ -1,8 +1,6 @@
 package farm.files;
 
-import farm.core.UnableToInteractException;
-import farm.core.farmgrid.FarmGrid;
-import farm.core.farmgrid.Grid;
+import farm.core.farmgrid.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -27,37 +25,44 @@ public class FileLoader {
      * @throws IOException
      */
     public Grid load(String filename) throws IOException {
-        List<List<String>> farmStats = new ArrayList<>();
-        int rows = 0;
-        int cols = 0;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-            String infoLine = reader.readLine();
-            if (infoLine != null) {
-                String[] farmInfo = infoLine.split(",");
-                this.farmType = farmInfo[0];
-                rows = Integer.parseInt(farmInfo[1]);
-                cols = Integer.parseInt(farmInfo[2]);
-            }
+            FarmGrid farmGrid = loadFarmInfo(reader);
+            List<List<String>> grid = loadFarmGrid(reader);
+            populateFarm(farmGrid, grid);
+            return farmGrid;
+        }
+    }
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] cells = line.split("\\|");
-                List<String> row = new ArrayList<>(Arrays.asList(cells));
-                farmStats.add(row);
-
-                if (rows == 0) {
-                    rows = row.size();
-                }
-            }
+    private FarmGrid loadFarmInfo(BufferedReader reader) throws IOException {
+        String infoLine = reader.readLine();
+        if (infoLine == null) {
+            throw new IOException("The file is empty or missing the farm information line");
         }
 
-        FarmGrid farmGrid = new FarmGrid(rows, cols, this.farmType);
+        String[] farmInfo = infoLine.split(",");
+        if (farmInfo.length != 3) {
+            throw new IOException("Invalid farm information line. " +
+                    "Expected farmType, number of rows, number of columns.");
+        }
 
-        this.populateFarm(farmGrid, farmStats);
+        this.farmType = farmInfo[0];
+        int rows = Integer.parseInt(farmInfo[1]);
+        int cols = Integer.parseInt(farmInfo[2]);
 
-        System.out.println(farmGrid.getStats());
-        return farmGrid;
+        GridManager farmGridManager = new FarmGridManager(rows, cols);
+        InteractionManager entityInteractionManager = new EntityInteractionManager(farmGridManager);
+        return new FarmGrid(farmGridManager, entityInteractionManager, this.farmType);
+    }
+
+    private List<List<String>> loadFarmGrid(BufferedReader reader) throws IOException {
+        List<List<String>> grid = new ArrayList<>();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] cells = line.split("\\|");
+            grid.add(new ArrayList<>(Arrays.asList(cells)));
+        }
+        return grid;
     }
 
 
@@ -69,8 +74,7 @@ public class FileLoader {
                 List<String> entityParts = List.of(cellInfo.split(","));
                 if (entityParts.size() > 2) {
                     char entitySymbol = entityParts.get(1).charAt(0);
-                    //                        farmGrid.addToCell(row, col, entitySymbol, entityParts);
-                    System.out.println(12);
+                    farmGrid.addToCell(row, col, entitySymbol, entityParts);
                 }
             }
         }

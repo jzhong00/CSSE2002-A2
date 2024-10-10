@@ -28,7 +28,7 @@ public class Animal extends FarmEntity {
 
     @Override
     public List<String> harvestEntity() {
-        this.setCollected(true);
+        setCollected(true);
         return getPositionInfo();
     }
 
@@ -58,6 +58,16 @@ public class Animal extends FarmEntity {
     @Override
     public String getType() {
         return "animal";
+    }
+
+    @Override
+    public void initialiseFromPositionInfo(List<String> positionInfo) {
+        if (positionInfo.get(2).contains("true")) {
+            setFed(true);
+        }
+        if (positionInfo.get(3).contains("true")) {
+            setCollected(true);
+        }
     }
 
     public boolean getFed() {

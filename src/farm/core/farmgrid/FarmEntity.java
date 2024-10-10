@@ -7,23 +7,37 @@ import farm.inventory.product.data.Quality;
 
 import java.util.List;
 
+/**
+ * An abstract class representing an entity that could be placed on the farm.
+ * <p>
+ * Each FarmEntity is an instance of a type of entity (i.e., plant or animal)
+ * </p>
+ */
 public abstract class FarmEntity {
     private final Entity entity;
 
-    public FarmEntity(char symbol) {
+    /**
+     * Constructs a FarmEntity based on the provided symbol.
+     * @param symbol a character representation of the entity to be created.
+     */
+    protected FarmEntity(char symbol) {
         this.entity = Entity.getBySymbol(symbol);
     }
 
-    public static FarmEntity createFarmEntity(char symbol, String farmType) throws UnableToInteractException {
+    /**
+     * Factory method to create a FarmEntity instance based on the
+     * specified symbol and farm type.
+     * @param symbol the symbol representation of a farm entity.
+     * @param farmType the type of farm to create an entity for.
+     * @return a FarmEntity for the farm.
+     * @throws IllegalArgumentException if the farm type is invalid.
+     */
+    public static FarmEntity createFarmEntity(char symbol, String farmType) {
         return switch (farmType) {
             case "plant" -> new Plant(symbol);
             case "animal" -> new Animal(symbol);
             default -> throw new IllegalArgumentException("Unknown farm type: " + farmType);
         };
-    }
-
-    protected FarmEntity getFarmEntity() {
-        return this;
     }
 
     public char getSymbol() {
@@ -53,5 +67,7 @@ public abstract class FarmEntity {
     public abstract List<String> reset();
 
     public abstract List<String> getPositionInfo();
+
+    public abstract void initialiseFromPositionInfo(List<String> positionInfo);
 
 }

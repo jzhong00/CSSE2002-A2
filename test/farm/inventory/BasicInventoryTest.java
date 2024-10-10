@@ -123,4 +123,46 @@ public class BasicInventoryTest {
         assertTrue("Unable to find product in inventory", inventory.existsProduct(wool));
     }
 
+    @Test
+    public void testValidRemoveFromInventory() {
+        populateInventory(inventory);
+
+        List<Product> removedProduct = inventory.removeProduct(egg);
+        assertEquals("Incorrect number of products removed", 1, removedProduct.size());
+        assertFalse("Product was not removed.", inventory.existsProduct(egg));
+        assertTrue("Product that should not have been removed does not exist", inventory.existsProduct(bread));
+        assertTrue("Product that should not have been removed does not exist", inventory.existsProduct(coffee));
+    }
+
+    @Test
+    public void testValidRemoveMultipleFromInventory() {
+        populateInventory(inventory);
+        List<Product> firstRemoved = inventory.removeProduct(egg);
+        List<Product> secondRemoved = inventory.removeProduct(bread);
+
+        assertEquals("Incorrect number of products in inventory", 1, inventory.getAllProducts().size());
+        assertFalse("Product was not removed", inventory.existsProduct(egg));
+        assertFalse("Product was not removed", inventory.existsProduct(bread));
+        assertTrue("Product that should not have been removed does not exist", inventory.existsProduct(coffee));
+    }
+
+    @Test
+    public void testRemoveInvalidProduct() {
+        populateInventory(inventory);
+
+        List<Product> products = inventory.removeProduct(wool);
+
+        assertEquals("Incorrect number of products removed", 0, products.size());
+        assertTrue("Product that should not have been removed does not exist", inventory.existsProduct(bread));
+        assertTrue("Product that should not have been removed does not exist", inventory.existsProduct(egg));
+        assertTrue("Product that should not have been removed does not exist", inventory.existsProduct(coffee));
+
+    }
+
+    private void populateInventory(BasicInventory inventory) {
+        inventory.addProduct(bread, gold);
+        inventory.addProduct(egg, silver);
+        inventory.addProduct(coffee, regular);
+    }
+
 }

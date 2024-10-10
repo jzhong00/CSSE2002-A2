@@ -201,6 +201,7 @@ public class FarmGridTest {
             itemsPlacedPlant.get(convertToPosition(INIT_ROW/2, INIT_COL/2)).set(1, Character.toString(wheatStage1));
             assertEquals("Unexpected stats produced", expectedStats(itemsPlacedPlant), plantGrid.getStats());
         } catch (Exception e) {
+            System.out.println(e);
             fail(shouldNotThrow);
         }
     }

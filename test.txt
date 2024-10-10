@@ -1,4 +1,5 @@
-animal,3,3
-ground, |ground, |ground, 
-ground, |cow,४,Fed: false,Collected: false|ground, 
-ground, |ground, |ground, 
+plant,5,5ground, |ground, |ground, |ground, |ground, 
+ground, |berry,.,Stage: 1|ground, |ground, |wheat,ἴ,Stage: 1
+ground, |ground, |ground, |ground, |ground, 
+ground, |ground, |ground, |ground, |ground, 
+ground, |ground, |ground, |ground, |ground, 

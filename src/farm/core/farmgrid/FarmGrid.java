@@ -2,32 +2,28 @@ package farm.core.farmgrid;
 
 import farm.core.UnableToInteractException;
 import farm.inventory.product.*;
-import farm.inventory.product.data.Quality;
 import farm.inventory.product.data.RandomQuality;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
 public class FarmGrid implements Grid {
 
     private final GridManager gridManager;
-    private final EntityInteractionManager interactionManager;
+    private final InteractionManager interactionManager;
     private final RandomQuality randomQuality;
-    private final String farmType;
+    private final FarmType farmType;
 
 
     /**
      * Constructor for the FarmGrid, creating a farm of specified type.
-     * @param rows the number of rows on the grid
-     * @param columns the number of columns on the grid
+     * TODO: finish docstrings
      * @requires rows > 0 && columns > 0
      */
-    public FarmGrid(int rows, int columns, String farmType) {
+    public FarmGrid(GridManager gridManager, InteractionManager interactionManager, FarmType farmType) {
 
-        this.gridManager = new GridManager(rows, columns);
-        this.interactionManager = new EntityInteractionManager(gridManager);
+        this.gridManager = gridManager;
+        this.interactionManager = interactionManager;
         this.randomQuality = new RandomQuality();
         this.farmType = farmType;
     }
@@ -44,11 +40,13 @@ public class FarmGrid implements Grid {
      * @requires rows > 0 && columns > 0
      */
     public FarmGrid(int rows, int columns) {
-        this(rows, columns, "plant");
+        GridManager farmGridManager = new FarmGridManager(rows, columns);
+        InteractionManager entityInteractionManager = new EntityInteractionManager(farmGridManager);
+        this(farmGridManager, entityInteractionManager, FarmType.PLANT);
     }
 
     public String getFarmType() {
-        return farmType;
+        return farmType.getName();
     }
 
     @Override
@@ -57,7 +55,7 @@ public class FarmGrid implements Grid {
         FarmEntity entity;
         try {
             entity = FarmEntity.createFarmEntity(symbol, this.getFarmType());
-        } catch (IllegalArgumentException | UnableToInteractException e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
         return interactionManager.place(row, column, entity, farmType);
@@ -109,5 +107,11 @@ public class FarmGrid implements Grid {
             default:
                 throw new UnableToInteractException("Unknown command: " + command);
         }
+    }
+
+    public void addToCell(int row, int column, char symbol, List<String> entityInfo) {
+        FarmEntity entity = FarmEntity.createFarmEntity(symbol, farmType);
+        entity.initialiseFromPositionInfo(entityInfo);
+        gridManager.addToCell(row, column, entity);
     }
 }

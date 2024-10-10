@@ -21,11 +21,12 @@ public class Plant extends FarmEntity {
 
     @Override
     public void checkReadyForHarvest() throws UnableToInteractException {
-        if (isPlantFullyGrown()) {
+        if (!isPlantFullyGrown()) {
             throw new UnableToInteractException("The crop is not fully grown!");
         }
     }
 
+    @Override
     public char getSymbol() {
         if (growthStage > 0) {
             return growthStageSymbols[growthStage - 1];
@@ -47,7 +48,7 @@ public class Plant extends FarmEntity {
 
     @Override
     public List<String> reset() {
-        if (isPlantFullyGrown()) {
+        if (!isPlantFullyGrown()) {
             setGrowthStage(getGrowthStage() + 1);
         }
         return getPositionInfo();
@@ -65,6 +66,12 @@ public class Plant extends FarmEntity {
     @Override
     public String getType() {
         return "plant";
+    }
+
+    @Override
+    public void initialiseFromPositionInfo(List<String> positionInfo) {
+        int stage = positionInfo.get(2).charAt(positionInfo.get(2).length() - 1);
+        this.setGrowthStage(stage);
     }
 
     public int getGrowthStage() {

@@ -106,7 +106,9 @@ public class FarmManager {
         }
 
         String farmType = input.get(1);
-        return new FarmGrid(row, col, farmType);
+        GridManager gridManager = new FarmGridManager(row, col);
+        InteractionManager entityInteractionManager = new EntityInteractionManager(gridManager);
+        return new FarmGrid(gridManager, entityInteractionManager, FarmType.fromString(farmType));
     }
 
     /**
