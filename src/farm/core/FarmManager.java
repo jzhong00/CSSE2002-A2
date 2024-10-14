@@ -2,6 +2,7 @@ package farm.core;
 
 import farm.core.farmgrid.*;
 import farm.customer.Customer;
+import farm.files.FarmDataFormatter;
 import farm.files.FileLoader;
 import farm.files.FileSaver;
 import farm.inventory.product.Product;
@@ -55,7 +56,7 @@ public class FarmManager {
         this.shop = shop;
         this.enableFancy = enableFancy;
         this.loader = new FileLoader();
-        this.saver = new FileSaver();
+        this.saver = new FileSaver(new FarmDataFormatter());
     }
 
     /**

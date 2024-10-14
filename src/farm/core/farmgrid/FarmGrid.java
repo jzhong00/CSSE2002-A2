@@ -77,6 +77,9 @@ public class FarmGrid implements Grid {
         } catch (NoSuchElementException e) {
             // Invalid symbol provided
             return false;
+        } catch (IllegalArgumentException e) {
+            // Attempted to place a non-matching entity type on the farm.
+            throw(e);
         }
 
         // Place the entity using the interaction manager
