@@ -8,7 +8,7 @@ import farm.inventory.product.data.Quality;
  * <br>
  * <b> Note: </b> See {@link Barcode#BREAD} for product information such as price and name.
  */
-public class Bread extends Product{
+public class Bread extends Product {
     /**
      * Create a bread instance with no additional details.
      * <br>

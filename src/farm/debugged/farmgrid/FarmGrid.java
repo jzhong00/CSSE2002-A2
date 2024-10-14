@@ -35,7 +35,7 @@ public class FarmGrid implements Grid {
         this.columns = columns;
 
 
-        farmState = new ArrayList<List<String>>();
+        farmState = new ArrayList<>();
 
         randomQuality = new RandomQuality();
 
@@ -95,17 +95,13 @@ public class FarmGrid implements Grid {
             itemName = "cow";
         } else if (symbol == '\u0D94') {
             itemName = "sheep";
-        }
-        else {
+        } else {
             return false;
         }
-
-
 
         String symbolString = Character.toString(symbol);
 
         try {
-
             if (!this.farmState.get(positionIndex).get(1).equals(" ")) {
                 throw new IllegalStateException("Something is already there!");
             }
@@ -137,9 +133,7 @@ public class FarmGrid implements Grid {
 
     @Override
     public int getRows() {
-
         return this.rows;
-
     }
 
     @Override
@@ -149,18 +143,18 @@ public class FarmGrid implements Grid {
 
     public void remove(int row, int column) {
         int positionIndex = (row * this.columns) + column;
-        if (positionIndex > farmState.size()) {
+        if (positionIndex >= farmState.size()) {
             return;
         }
-        if (row > this.rows - 1) {
+        if (row < 0 || row > this.rows - 1) {
             return;
         }
-        if (column > this.columns - 1) {
+        if (column < 0 || column > this.columns - 1) {
             return;
         }
 
         // replace the spot with empty ground
-        List<String> spotOnGrid = new ArrayList();
+        List<String> spotOnGrid = new ArrayList<>();
         spotOnGrid.add("ground");
         spotOnGrid.add(" ");
         farmState.set(positionIndex, spotOnGrid);
@@ -181,9 +175,9 @@ public class FarmGrid implements Grid {
         // note System.lineSeparator() is just \n but ensures it works
         // on all operating systems.
 
-        for (int i=0; i < this.rows; i++) {
+        for (int i = 0; i < this.rows; i++) {
             farmDisplay += "| ";
-            for (int j=0; j < this.columns; j++) {
+            for (int j = 0; j < this.columns; j++) {
                 int positionIndex = (i * this.columns) + j;
                 farmDisplay += farmState.get(positionIndex).get(1) + " ";
             }
@@ -221,7 +215,7 @@ public class FarmGrid implements Grid {
 
         // if the position contains an animal
         if ((positionInfo.get(0).equals("cow") || positionInfo.get(0).equals("chicken")
-        || positionInfo.get(0).equals("sheep")) && this.farmType.equals("animal")) {
+                || positionInfo.get(0).equals("sheep")) && this.farmType.equals("animal")) {
             // check fed and collected status of animal
             if (positionInfo.get(2).equals("Fed: false")) {
                 throw new UnableToInteractException("You have not fed this animal today!");
@@ -252,10 +246,10 @@ public class FarmGrid implements Grid {
             } else {
                 throw new UnableToInteractException("You have an animal on a plant farm!");
             }
-        } else if ((positionInfo.get(0).equals("wheat") ||
-        positionInfo.get(0).equals("berry") || positionInfo.get(0).equals("coffee")) && this.farmType.equals("plant")) {
+        } else if ((positionInfo.get(0).equals("wheat") || positionInfo.get(0).equals("berry")
+                || positionInfo.get(0).equals("coffee")) && this.farmType.equals("plant")) {
             // get a random quality
-           Quality quality = randomQuality.getRandomQuality();
+            Quality quality = randomQuality.getRandomQuality();
 
 
             // check stage
@@ -321,14 +315,12 @@ public class FarmGrid implements Grid {
      */
     public boolean feed(int row, int col) {
 
-       if (row > this.rows - 1 || row <= -1) {
+        if (row > this.rows - 1 || row <= -1) {
             return false;
         }
         if (col > this.columns - 1 || col <= -1) {
             return false;
         }
-
-
 
         int positionIndex = (row * this.columns) + col;
         if (positionIndex > farmState.size()) {
@@ -354,14 +346,14 @@ public class FarmGrid implements Grid {
      * For animals, this sets fed and collection status to false.
      */
     public void endDay() {
-        List<String> plantsThatCanGrow = List.of(".", "o", "\u1F34", ":", ";", "*");
+        List<String> plantsThatCanGrow = List.of(".", "o", "ἴ", ":", ";", "*");
         List<String> animalSymbols = List.of("\u096A", "\u0D94", "\u09EC");
 
         int i = 0;
         for (List<String> itemInfo : farmState) {
             if (this.farmType.equals("plant")) {
                 // if the plant is not at a final stage, increment stage and symbol
-              if (plantsThatCanGrow.contains(itemInfo.get(1))) {
+                if (plantsThatCanGrow.contains(itemInfo.get(1))) {
                     // berries
                     if (itemInfo.get(1).equals(".")) {
                         if (itemInfo.get(2).equals("Stage: 0")) {
@@ -375,7 +367,7 @@ public class FarmGrid implements Grid {
                     } else if (itemInfo.get(1).equals("\u1F34")) {
                         // wheat
                         if (itemInfo.get(2).equals("Stage: 0")) {
-                            farmState.set(i, List.of("wheat", "\u1F34", "Stage: 1"));
+                            farmState.set(i, List.of("wheat", "ἴ", "Stage: 1"));
                         } else {
                             farmState.set(i, List.of("wheat", "#", "Stage: 2"));
                         }

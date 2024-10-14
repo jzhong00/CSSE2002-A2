@@ -131,11 +131,32 @@ public class FarmGridTest {
     }
 
     @Test
+    public void placeAtEdgeTest() {
+        plantGrid.place(0, INIT_COL - 1, coffeeStage1);
+        plantGrid.place(INIT_ROW - 1, 0, berryStage1);
+        plantGrid.place(INIT_ROW - 1, INIT_COL - 1, wheatStage1);
+
+        itemsPlacedPlant.put(convertToPosition(0, INIT_COL - 1), new ArrayList<>(Arrays.asList("coffee", Character.toString(coffeeStage1), "Stage: 1")));
+        itemsPlacedPlant.put(convertToPosition(INIT_ROW - 1, 0), new ArrayList<>(Arrays.asList("berry", Character.toString(berryStage1), "Stage: 1")));
+        itemsPlacedPlant.put(convertToPosition(INIT_ROW - 1, INIT_COL - 1), new ArrayList<>(Arrays.asList("wheat", Character.toString(wheatStage1), "Stage: 1")));
+
+        assertEquals("Placing at the edge failed", expectedStats(itemsPlacedPlant), plantGrid.getStats());
+    }
+
+    @Test
     public void simpleRemovePlantGridTest() {
         plantGrid.place(INIT_ROW/2, INIT_COL/2, berryStage1);
         attemptInteraction(plantGrid, REMOVE, INIT_ROW/2, INIT_COL/2);
         assertEquals("Plant grid stats was incorrect after removal",
                 expectedStats(new HashMap<>()), plantGrid.getStats());
+    }
+
+    @Test
+    public void removeInvalidPositionTest() throws UnableToInteractException {
+        populatePlantFarm(plantGrid);
+
+        plantGrid.interact(REMOVE, -1, INIT_COL);
+        assertEquals("Removing an invalid position changed farm stats", expectedStats(itemsPlacedPlant), plantGrid.getStats());
     }
 
     @Test
@@ -159,6 +180,16 @@ public class FarmGridTest {
         }
         itemsPlacedAnimal.get(convertToPosition(INIT_ROW/2, INIT_COL/2)).set(3, "Collected: true");
         assertEquals(expectedStats(itemsPlacedAnimal), animalGrid.getStats());
+    }
+
+    @Test
+    public void cannotHarvestWithoutFeedingAnimalTest() {
+        populateAnimalFarm(animalGrid);
+
+        String exceptionMsg = assertThrows(UnableToInteractException.class,
+                () -> animalGrid.harvest(INIT_ROW/2, INIT_COL/2)).getMessage();
+        assertEquals("Harvested without feeding animal", "You have not fed this animal today!", exceptionMsg);
+        assertEquals("Farm stats changed when trying to harvest without feeding", expectedStats(itemsPlacedAnimal), animalGrid.getStats());
     }
 
     @Test
@@ -232,6 +263,26 @@ public class FarmGridTest {
         itemsPlacedPlant.get(convertToPosition(INIT_ROW - 1, INIT_COL - 1)).set(2, "Stage: 2");
         itemsPlacedPlant.get(convertToPosition(INIT_ROW - 1, INIT_COL - 1)).set(1, Character.toString(berryStage2));
         assertEquals(expectedStats(itemsPlacedPlant), plantGrid.getStats());
+    }
+
+
+    @Test
+    public void endDayOnEmptyGridTest() {
+        assertEquals("Empty plant grid did not return expected stats before end-day", expectedStats(new HashMap<>()), plantGrid.getStats());
+        attemptInteraction(plantGrid, END_DAY, 0, 0);
+        assertEquals("Empty plant grid changed after end-day", expectedStats(new HashMap<>()), plantGrid.getStats());
+
+        assertEquals("Empty animal grid did not return expected stats before end-day", expectedStats(new HashMap<>()), animalGrid.getStats());
+        attemptInteraction(animalGrid, END_DAY, 0, 0);
+        assertEquals("Empty animal grid changed after end-day", expectedStats(new HashMap<>()), animalGrid.getStats());
+    }
+
+    @Test
+    public void feedPlantFailureTest() {
+        populatePlantFarm(plantGrid);
+        String exceptionMsg = assertThrows(UnableToInteractException.class,
+                () -> plantGrid.interact(FEED, 0, 0)).getMessage();
+        assertEquals("Incorrect exception message when trying to feed a plant", "You cannot feed something that is not an animal!", exceptionMsg);
     }
 
     private void populatePlantGrownPlantGrid(Grid plantGrid) {

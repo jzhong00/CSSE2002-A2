@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a cell in the farm grid that could contain a {@link FarmEntity}
+ * Represents a cell in the farm grid that could contain a FarmEntity
  * and its associated position information.
  */
 public class Cell {
@@ -51,6 +51,7 @@ public class Cell {
      * Removes the current entity and its associated information from the cell.
      */
     public void removeEntity() {
+        // Set both the entity and position information to null
         this.entity = null;
         this.positionInfo = null;
     }

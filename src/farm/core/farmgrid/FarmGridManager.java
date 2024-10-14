@@ -3,27 +3,44 @@ package farm.core.farmgrid;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A class that manages the grid for the farm.
+ */
 public class FarmGridManager implements GridManager {
 
     private final Cell[][] grid;
     private final int rows;
     private final int columns;
 
+    /**
+     * Constructs the FarmGridManager.
+     * @param rows the number of rows in the grid
+     * @param columns the number of columns in the grid
+     * @throws IllegalArgumentException if the provided rows and columns are not valid
+     * @requires rows > 0 and columns > 0
+     */
     public FarmGridManager(int rows, int columns) {
+        // Check the number of rows and columns are greater than 0
         if (rows <= 0 || columns <= 0) {
             throw new IllegalArgumentException("Rows and columns must be greater than 0");
         }
 
         this.rows = rows;
         this.columns = columns;
+        // Create a grid of cells with the size rows x columns
         this.grid = new Cell[rows][columns];
 
         initialiseGrid();
     }
 
+    /**
+     * Initialises each cell in the grid
+     */
     private void initialiseGrid() {
+        // Iterate through each position
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
+                // Create a new cell in that location
                 grid[i][j] = new Cell();
             }
         }
@@ -51,11 +68,26 @@ public class FarmGridManager implements GridManager {
     }
 
     @Override
-    public boolean placeEntity(int row, int column, FarmEntity entity, List<String> positionInfo) {
+    public boolean placeEntity(
+            int row,
+            int column,
+            boolean initialPlace,
+            FarmEntity entity,
+            List<String> positionInfo
+    ) {
+        // Check if the position is valid
         if (!isValidCell(row, column)) {
             return false;
         }
 
+        // Check the cell is empty if an entity is being placed for the first time
+        if (initialPlace) {
+            if (!isCellEmpty(row, column)) {
+                throw new IllegalStateException("Something is already there!");
+            }
+        }
+
+        // Add the entity to the cell
         Cell cell = grid[row][column];
         cell.addEntity(entity, positionInfo);
 
@@ -63,14 +95,19 @@ public class FarmGridManager implements GridManager {
     }
 
     @Override
-    public void removeEntity(int row, int column) {
+    public boolean removeEntity(int row, int column) {
         if (isValidCell(row, column)) {
             grid[row][column].removeEntity();
+            return true;
         }
+        return false;
     }
 
     @Override
     public Cell getCell(int row, int column) {
+        if (!isValidCell(row, column)) {
+            throw new IllegalArgumentException("Not a valid location!");
+        }
         return grid[row][column];
     }
 
@@ -95,8 +132,10 @@ public class FarmGridManager implements GridManager {
             for (int j = 0; j < getColumns(); j++) {
 
                 Cell cell = getCell(i, j);
+                // Set the cell as ground
                 char symbol = ' ';
 
+                // Update the cell with the entity symbol if it is not empty
                 if (!cell.isEmpty()) {
                     symbol = cell.getEntity().getSymbol();
                 }
@@ -126,6 +165,7 @@ public class FarmGridManager implements GridManager {
                 if (!cell.isEmpty()) {
                     farmStats.add(cell.getPositionInfo());
                 } else {
+                    // Add the representation for ground
                     List<String> spotOnGrid = new ArrayList<>();
                     spotOnGrid.add("ground");
                     spotOnGrid.add(" ");
@@ -134,11 +174,5 @@ public class FarmGridManager implements GridManager {
             }
         }
         return farmStats;
-    }
-
-    @Override
-    public void addToCell(int row, int column, FarmEntity entity) {
-        Cell cell = grid[row][column];
-        cell.addEntity(entity, entity.getPositionInfo());
     }
 }

@@ -87,6 +87,22 @@ public class BasicInventoryTest {
     }
 
     @Test
+    public void testAddProductOneQuantity() {
+        String exceptionMsg = assertThrows(InvalidStockRequestException.class,
+                () -> inventory.addProduct(Barcode.WOOL, Quality.SILVER, 1)).getMessage();
+
+        assertEquals(
+                "Current inventory is not fancy enough. Please supply products one at a time.",
+                exceptionMsg
+        );
+
+        List<Product> products = inventory.getAllProducts();
+        assertTrue("Product was added to inventory when it shouldn't have been", inventory.getAllProducts().isEmpty());
+    }
+
+
+
+    @Test
     public void testAddProductMultipleTimes() {
         for (int i = 0; i < 5; i++) {
             inventory.addProduct(milk, regular);
@@ -124,6 +140,12 @@ public class BasicInventoryTest {
 
         assertFalse("Incorrectly returned if product was in inventory", inventory.existsProduct(wool));
     }
+
+    @Test
+    public void testProductDoesNotExistWithoutAdding() {
+        assertFalse("Product should not exist if it hasn't been added", inventory.existsProduct(milk));
+    }
+
 
     @Test
     public void testExistProductInMultipleItems() {

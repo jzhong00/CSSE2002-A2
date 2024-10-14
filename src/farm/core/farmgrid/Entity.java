@@ -4,6 +4,8 @@ import farm.inventory.product.*;
 import farm.inventory.product.data.Barcode;
 import farm.inventory.product.data.Quality;
 
+import java.util.NoSuchElementException;
+
 
 /**
  * A collection of all entities that can be placed on the grid.
@@ -13,12 +15,12 @@ import farm.inventory.product.data.Quality;
  * </p>
  */
 public enum Entity {
-    BERRY('.', "berry", Barcode.JAM),
-    COFFEE(':', "coffee", Barcode.COFFEE),
-    WHEAT('\u1F34', "wheat", Barcode.BREAD),
-    CHICKEN('\u09EC', "chicken", Barcode.EGG),
-    COW('\u096A', "cow", Barcode.MILK),
-    SHEEP('\u0D94', "sheep", Barcode.WOOL);
+    BERRY('.', "berry", Barcode.JAM, FarmType.PLANT),
+    COFFEE(':', "coffee", Barcode.COFFEE, FarmType.PLANT),
+    WHEAT('ἴ', "wheat", Barcode.BREAD, FarmType.PLANT),
+    CHICKEN('৬', "chicken", Barcode.EGG, FarmType.ANIMAL),
+    COW('४', "cow", Barcode.MILK, FarmType.ANIMAL),
+    SHEEP('ඔ', "sheep", Barcode.WOOL, FarmType.ANIMAL);
 
     /**
      * Retrieves the symbol representation of the entity.
@@ -45,6 +47,14 @@ public enum Entity {
     }
 
     /**
+     * Retrieves the FarmType this entity can be placed on
+     * @return the FarmType for this entity.
+     */
+    public FarmType getFarmType() {
+        return this.type;
+    }
+
+    /**
      * Returns a Product for this entity with the provided quality.
      * @param quality the quality of the produced product
      * @return a Product object
@@ -68,18 +78,26 @@ public enum Entity {
      * @param symbol the symbol representing the entity
      * @return the Entity corresponding to the symbol
      * @throws IllegalStateException if the symbol is not recognised.
+     * @requires symbol to represent a valid entity.
      */
     public static Entity getBySymbol(char symbol) {
         for (Entity entity : values()) {
+            // Return the entity if the provided symbol matches any in the enum
             if (entity.getSymbol() == symbol) {
                 return entity;
             }
         }
-        throw new IllegalArgumentException("Invalid Symbol");
+        throw new NoSuchElementException("Invalid Symbol");
     }
 
+    /**
+     * Retrieves the symbol associated with an Entity by the entity's name.
+     * @param name the name of the entity.
+     * @return a character representing the entity.
+     */
     public static char getSymbolByName(String name) {
         for (Entity entity : values()) {
+            // Return the entity's symbol if its name matches any in the enum
             if (entity.getName().equals(name)) {
                 return entity.getSymbol();
             }
@@ -90,6 +108,7 @@ public enum Entity {
     private final char symbol;
     private final String name;
     private final Barcode barcode;
+    private final FarmType type;
 
     /**
      * Constructor for an Entity.
@@ -97,9 +116,10 @@ public enum Entity {
      * @param name the name of the entity
      * @param barcode the Barcode associated with the product produced by the entity.
      */
-    Entity(char symbol, String name, Barcode barcode) {
+    Entity(char symbol, String name, Barcode barcode, FarmType type) {
         this.symbol = symbol;
         this.name = name;
         this.barcode = barcode;
+        this.type = type;
     }
 }
