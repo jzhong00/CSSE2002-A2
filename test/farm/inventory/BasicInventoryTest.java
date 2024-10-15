@@ -126,6 +126,7 @@ public class BasicInventoryTest {
         }
     }
 
+
     @Test
     public void testExistsValidProduct() {
         inventory.addProduct(wool, silver);
